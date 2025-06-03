@@ -1,33 +1,41 @@
 #include <check.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <emu.h>
+#include <stdlib.h>
 
-#include <cpu.h>
+#include "cart.h"
 
-START_TEST(test_nothing) {
-    bool b = cpu_step();
-    ck_assert_uint_eq(b, false);
-} END_TEST
+START_TEST(test_format_cart_metadata) {
+  cart_metadata_t metadata;
 
-Suite *stack_suite() {
-    Suite *s = suite_create("emu");
-    TCase *tc = tcase_create("core");
+  metadata.cart_type = 0x77;
+  char buf[1024];
+  format_cart_metadata(buf, sizeof(buf), metadata);
+  ck_assert_str_eq(buf, "Cart type: 0x77");
+};
 
-    tcase_add_test(tc, test_nothing);
-    suite_add_tcase(s, tc);
+Suite *cart_suite(void) {
+  Suite *s;
+  TCase *tc_core;
 
-    return s;
+  s = suite_create("cart");
+
+  tc_core = tcase_create("core");
+  tcase_add_test(tc_core, test_format_cart_metadata);
+  suite_add_tcase(s, tc_core);
+
+  return s;
 }
 
-int main() {
-    Suite *s = stack_suite();
-    SRunner *sr = srunner_create(s);
-    srunner_run_all(sr, CK_NORMAL);
-    int nf = srunner_ntests_failed(sr);
+int main(void) {
+  int number_failed;
+  Suite *s;
+  SRunner *sr;
 
-    srunner_free(sr);
+  s = cart_suite();
+  sr = srunner_create(s);
 
-    return nf == 0 ? 0 : -1;
+  srunner_run_all(sr, CK_NORMAL);
+  number_failed = srunner_ntests_failed(sr);
+  srunner_free(sr);
+  return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
