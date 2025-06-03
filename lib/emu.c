@@ -14,10 +14,7 @@ int emu_run(int argc, char *argv[]) {
     return -1;
   }
 
-  if (!load_cart(argv[1])) {
-    printf("Failed to load ROM file: %s\n", argv[1]);
-    return -2;
-  }
+  cart_t cart = load_cart(argv[1]);
 
   return 0;
 }
