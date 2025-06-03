@@ -8,12 +8,6 @@
 #include "cart.h"
 #include <string.h>
 
-/**
- * @brief Load cart/ROM from a file
- * @param cart_path Path to the ROM file
- * @return true if the cartridge was loaded successfully, false otherwise
- */
-
 typedef struct cart_context {
   char filename[1024];
   u32 rom_size;
@@ -21,8 +15,53 @@ typedef struct cart_context {
   u8 *rom_data;
 } cart_context_t;
 
+/* ROM type codes to names, as per
+ * https://gbdev.io/pandocs/The_Cartridge_Header.html#0147-rom-type */
+static const char *ROM_TYPES_NAMES[] = {
+    "ROM ONLY",
+    "MBC1",
+    "MBC1+RAM",
+    "MBC1+RAM+BATTERY",
+    "0x04 ???",
+    "MBC2",
+    "MBC2+BATTERY",
+    "0x07 ???",
+    "ROM+RAM 1",
+    "ROM+RAM+BATTERY 1",
+    "0x0A ???",
+    "MMM01",
+    "MMM01+RAM",
+    "MMM01+RAM+BATTERY",
+    "0x0E ???",
+    "MBC3+TIMER+BATTERY",
+    "MBC3+TIMER+RAM+BATTERY 2",
+    "MBC3",
+    "MBC3+RAM 2",
+    "MBC3+RAM+BATTERY 2",
+    "0x14 ???",
+    "0x15 ???",
+    "0x16 ???",
+    "0x17 ???",
+    "0x18 ???",
+    "MBC5",
+    "MBC5+RAM",
+    "MBC5+RAM+BATTERY",
+    "MBC5+RUMBLE",
+    "MBC5+RUMBLE+RAM",
+    "MBC5+RUMBLE+RAM+BATTERY",
+    "0x1F ???",
+    "MBC6",
+    "0x21 ???",
+    "MBC7+SENSOR+RUMBLE+RAM+BATTERY",
+};
+
 static cart_context_t cart_ctx;
 
+/**
+ * @brief Load a cartridge from a path
+ * @param p_cart_path Path to the cartridge file
+ * @return true if the cartridge was loaded successfully, false otherwise
+ */
 bool load_cart(char *p_cart_path) {
   strncpy(cart_ctx.filename, p_cart_path, sizeof(cart_ctx.filename) - 1);
 
@@ -59,10 +98,20 @@ bool load_cart(char *p_cart_path) {
   return true;
 };
 
+/**
+ * @brief Format cart metadata into a string
+ * @param buf Buffer to store the formatted metadata
+ * @param buflen Length of the buffer
+ * @param metadata Cartridge metadata
+ */
 void format_cart_metadata(char *buf, size_t buflen, cart_metadata_t metadata) {
-  snprintf(buf, buflen, "Cart type: 0x%02X", metadata.cart_type);
+  snprintf(buf, buflen, "Cart type: %s (0x%02X)",
+           ROM_TYPES_NAMES[metadata.cart_type], metadata.cart_type);
 };
 
+/**
+ * @brief Display cartridge metadata
+ */
 static void display_cart_metadata() {
   char metadata_buf[1024];
   format_cart_metadata(metadata_buf, sizeof(metadata_buf),

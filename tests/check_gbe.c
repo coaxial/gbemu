@@ -6,11 +6,12 @@
 
 START_TEST(test_format_cart_metadata) {
   cart_metadata_t metadata;
-
-  metadata.cart_type = 0x77;
+  metadata.cart_type = 0x06;
   char buf[1024];
+
   format_cart_metadata(buf, sizeof(buf), metadata);
-  ck_assert_str_eq(buf, "Cart type: 0x77");
+
+  ck_assert_str_eq(buf, "Cart type: MBC2+BATTERY (0x06)");
 };
 
 Suite *cart_suite(void) {
