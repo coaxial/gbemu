@@ -2,21 +2,17 @@
 
 typedef struct cart_metadata {
   u32 entry;
-  u8 logo[48]; // Or 0x30 bytes: the logo is 3 lines of 16 bytes; or 3 lines
-  // of 0x10 bytes (16 decimal into hex) times 3 = 0x30.
+  // 48 or 0x30 bytes: the logo is 3 lines of 16 bytes; or 3 lines of 0x10
+  // bytes(16 decimal into hex) times 3 = 0x30.
+  u8 logo[48];
   char title[16];
-  // TODO:
-  // https://gbdev.io/pandocs/The_Cartridge_Header.html#01440145--new-licensee-code
-  // to add code to name table
   u16 new_licensee_code;
   u8 sgb_flag;
   u8 cart_type;
-  // TODO: Implement number of banks calculation
+  // TODO : Implement number of banks calculation u8 rom_size;
   u8 rom_size;
   u8 ram_size;
   u8 destination_code;
-  // TODO: Translate code to name
-  // https://gbdev.io/pandocs/The_Cartridge_Header.html#014b--old-licensee-code
   u8 old_licensee_code;
   u8 version;
   u8 checksum;
