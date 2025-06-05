@@ -1,6 +1,6 @@
 # Gameboy Emulator
 
-A Gameboy (DMG) emulator written in C.
+A Gameboy (DMG) emulator written in C, inspired from [rockytriton/LLD_gbemu](https://github.com/rockytriton/LLD_gbemu).
 
 ## Requirements
 
