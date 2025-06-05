@@ -1,24 +1,8 @@
 #include <check.h>
 #include <emu.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "cart.h"
-
-/* START_TEST(test_format_cart_metadata) { */
-/*   cart_metadata_t metadata; */
-/*   metadata.cart_type = 0x06; */
-/*   strncpy(metadata.title, "Test ROM", sizeof(metadata.title)); */
-/*   metadata.version = 0x00; */
-/*   char buf[1024]; */
-/**/
-/*   format_cart_metadata(buf, sizeof(buf), metadata); */
-/**/
-/*   ck_assert_str_eq(buf, */
-/*                    "Cart title: Test ROM (v0)\nCart type: MBC2+BATTERY
- * (0x06)"); */
-/* }; */
 
 START_TEST(test_cart_metadata) {
   cart_t cart = load_cart("../roms/tests/blargg/cpu_instrs.gb");
