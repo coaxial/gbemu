@@ -15,6 +15,7 @@ int emu_run(int argc, char *argv[]) {
   }
 
   cart_t cart = load_cart(argv[1]);
+  print_cart_metadata();
 
   return 0;
 }

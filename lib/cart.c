@@ -333,10 +333,12 @@ cart_t load_cart(char *p_cart_path) {
 void format_cart_metadata(char *buf, size_t buflen, cart_metadata_t metadata) {
   const char *licensee_name =
       get_licensee_name(metadata.old_licensee_code, metadata.new_licensee_code);
-  snprintf(buf, buflen,
-           "Cart title:\t%s (v%d)\nLicensee:\t0x%04X\nCart type:\t%s (0x%02X)",
-           metadata.title, metadata.version, metadata.new_licensee_code,
-           ROM_TYPES_NAMES[metadata.cart_type], metadata.cart_type);
+  snprintf(
+      buf, buflen,
+      "Cart title:\t%s (v%d)\nLicensee:\t%s (0x%04X)\nCart type:\t%s (0x%02X)",
+      metadata.title, metadata.version, licensee_name,
+      metadata.new_licensee_code, ROM_TYPES_NAMES[metadata.cart_type],
+      metadata.cart_type);
 };
 
 /**
