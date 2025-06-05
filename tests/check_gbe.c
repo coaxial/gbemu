@@ -21,19 +21,19 @@
 /* }; */
 
 START_TEST(test_cart_metadata) {
-  cart_t cart = load_cart("../roms/tests/cpu_instrs.gb");
+  cart_t cart = load_cart("../roms/tests/blargg/cpu_instrs.gb");
 
-  ck_assert_str_eq(cart.rom_metadata->title, "CPU_INSTRS");
-  ck_assert_uint_eq(cart.rom_metadata->new_licensee_code, 0x00);
-  ck_assert_uint_eq(cart.rom_metadata->sgb_flag, 0x00);
-  ck_assert_uint_eq(cart.rom_metadata->cart_type, 0x01);
-  ck_assert_uint_eq(cart.rom_metadata->rom_size, 0x01);
-  ck_assert_uint_eq(cart.rom_metadata->ram_size, 0x00);
-  ck_assert_uint_eq(cart.rom_metadata->destination_code, 0x00);
-  ck_assert_uint_eq(cart.rom_metadata->old_licensee_code, 0x00);
-  ck_assert_uint_eq(cart.rom_metadata->version, 0x00);
-  ck_assert_uint_eq(cart.rom_metadata->checksum, 0x3b);
-  ck_assert_uint_eq(cart.rom_metadata->global_checksum, 0xf530);
+  ck_assert_str_eq(cart.metadata->title, "CPU_INSTRS");
+  ck_assert_uint_eq(cart.metadata->new_licensee_code, 0x00);
+  ck_assert_uint_eq(cart.metadata->sgb_flag, 0x00);
+  ck_assert_uint_eq(cart.metadata->cart_type, 0x01);
+  ck_assert_uint_eq(cart.metadata->rom_size, 0x01);
+  ck_assert_uint_eq(cart.metadata->ram_size, 0x00);
+  ck_assert_uint_eq(cart.metadata->destination_code, 0x00);
+  ck_assert_uint_eq(cart.metadata->old_licensee_code, 0x00);
+  ck_assert_uint_eq(cart.metadata->version, 0x00);
+  ck_assert_uint_eq(cart.metadata->checksum, 0x3b);
+  ck_assert_uint_eq(cart.metadata->global_checksum, 0xf530);
 }
 END_TEST
 
@@ -65,9 +65,9 @@ START_TEST(test_get_licensee_name) {
 END_TEST
 
 START_TEST(test_metadata_title_padding) {
-  cart_t cart = load_cart("../roms/tests/new_lic_code.rom");
+  cart_t cart = load_cart("../roms/tests/new_lic_code.gb");
 
-  ck_assert_str_eq(cart.rom_metadata->title, "COFFEEBREAK");
+  ck_assert_str_eq(cart.metadata->title, "COFFEEBREAK");
 }
 END_TEST
 

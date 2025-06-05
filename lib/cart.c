@@ -260,7 +260,7 @@ static new_licensee_name_t NEW_LICENSEE_NAME[] = {
     {"92", "Video System"},
     {"93", "Ocean Software/Acclaim Entertainment"},
     {"95", "Varie"},
-    {"96", "Yonezawa/s’pal"},
+    {"96", "Yonezawa/S’Pal"},
     {"97", "Kaneko"},
     {"99", "Pack-In-Video"},
     {"9H", "Bottom Up"},
@@ -293,33 +293,32 @@ cart_t load_cart(char *p_cart_path) {
 
   rewind(rom_file);
 
-  cart_ctx.rom_data = malloc(cart_ctx.rom_size);
-  fread(cart_ctx.rom_data, cart_ctx.rom_size, 1, rom_file);
+  cart_ctx.rom = malloc(cart_ctx.rom_size);
+  fread(cart_ctx.rom, cart_ctx.rom_size, 1, rom_file);
   fclose(rom_file);
 
-  cart_ctx.rom_metadata =
-      (cart_metadata_t *)(cart_ctx.rom_data +
-                          0x100); // Metadata starts at 0x100
+  cart_ctx.metadata =
+      (cart_metadata_t *)(cart_ctx.rom + 0x100); // Metadata starts at 0x100
 
-  if (cart_ctx.rom_metadata->old_licensee_code == SEE_NEW_LICENSEE_CODE) {
+  if (cart_ctx.metadata->old_licensee_code == SEE_NEW_LICENSEE_CODE) {
     /* Pad the title string when using the new license code as that shrinks the
      * title string to 11 chars instead. */
-    cart_ctx.rom_metadata->title[11] = '\0';
-    cart_ctx.rom_metadata->title[12] = '\0';
-    cart_ctx.rom_metadata->title[13] = '\0';
-    cart_ctx.rom_metadata->title[14] = '\0';
+    cart_ctx.metadata->title[11] = '\0';
+    cart_ctx.metadata->title[12] = '\0';
+    cart_ctx.metadata->title[13] = '\0';
+    cart_ctx.metadata->title[14] = '\0';
   };
 
   /* Terminate the title string in case it isn't for some reason */
-  cart_ctx.rom_metadata->title[15] = '\0';
+  cart_ctx.metadata->title[15] = '\0';
 
   /* These 16 bits values are big endian in the ROM. Intel CPUs are little
    * endian, which reverses the bytes when loading them into a struct directly.
    * So we put them back in the original order. */
-  cart_ctx.rom_metadata->new_licensee_code =
-      (cart_ctx.rom_data[0x144] << 8 | cart_ctx.rom_data[0x145]);
-  cart_ctx.rom_metadata->global_checksum =
-      (cart_ctx.rom_data[0x14e] << 8 | cart_ctx.rom_data[0x14f]);
+  cart_ctx.metadata->new_licensee_code =
+      (cart_ctx.rom[0x144] << 8 | cart_ctx.rom[0x145]);
+  cart_ctx.metadata->global_checksum =
+      (cart_ctx.rom[0x14e] << 8 | cart_ctx.rom[0x14f]);
 
   return cart_ctx;
 };
@@ -346,8 +345,7 @@ void format_cart_metadata(char *buf, size_t buflen, cart_metadata_t metadata) {
  */
 void print_cart_metadata() {
   char metadata_buf[1024];
-  format_cart_metadata(metadata_buf, sizeof(metadata_buf),
-                       *cart_ctx.rom_metadata);
+  format_cart_metadata(metadata_buf, sizeof(metadata_buf), *cart_ctx.metadata);
 
   printf("%s\n", metadata_buf);
 };

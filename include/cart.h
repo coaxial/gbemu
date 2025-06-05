@@ -26,8 +26,8 @@ typedef struct cart_metadata {
 typedef struct cart {
   char filename[1024];
   u32 rom_size;
-  cart_metadata_t *rom_metadata;
-  u8 *rom_data;
+  cart_metadata_t *metadata;
+  u8 *rom;
 } cart_t;
 
 void format_cart_metadata(char *buf, size_t buflen, cart_metadata_t metadata);
