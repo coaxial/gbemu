@@ -9,7 +9,7 @@ typedef struct cart_metadata {
   u16 new_licensee_code;
   u8 sgb_flag;
   u8 cart_type;
-  // TODO : Implement number of banks calculation u8 rom_size;
+  // TODO : Implement number of banks calculation
   u8 rom_size;
   u8 ram_size;
   u8 destination_code;
