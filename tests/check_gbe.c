@@ -21,7 +21,7 @@
 /* }; */
 
 START_TEST(test_cart_metadata) {
-  cart_t cart = load_cart("../roms/cpu_instrs.gb");
+  cart_t cart = load_cart("../roms/tests/cpu_instrs.gb");
 
   ck_assert_str_eq(cart.rom_metadata->title, "CPU_INSTRS");
   ck_assert_uint_eq(cart.rom_metadata->new_licensee_code, 0x00);
@@ -37,6 +37,40 @@ START_TEST(test_cart_metadata) {
 }
 END_TEST
 
+START_TEST(test_get_licensee_name) {
+  u8 OLD_LIC_CODES[] = {0x00, 0x01, 0x69, 0xB9, 0xFF};
+  char *OLD_LIC_NAMES[] = {"None", "Nintendo", "EA (Electronic Arts)",
+                           "Pony Canyon", "LJN"};
+  char *NEW_LIC_CODES[] = {"00", "01", "78", "DK"};
+  char *NEW_LIC_NAMES[] = {"None", "Nintendo Research & Development 1", "THQ",
+                           "Kodansha"};
+
+  for (int i = 0; i < (sizeof(OLD_LIC_CODES) / sizeof(u8)); i++) {
+    char *expected = OLD_LIC_NAMES[i];
+
+    const char *actual = get_licensee_name(OLD_LIC_CODES[i], 0xBABE);
+
+    ck_assert_str_eq(actual, expected);
+  }
+
+  for (int i = 0; i < (sizeof(NEW_LIC_CODES) / sizeof(char *)); i++) {
+    u16 raw_code = ((NEW_LIC_CODES[i][0] << 8) | NEW_LIC_CODES[i][1]);
+    char *expected = NEW_LIC_NAMES[i];
+
+    const char *actual = get_licensee_name(0x33, raw_code);
+
+    ck_assert_str_eq(actual, expected);
+  }
+}
+END_TEST
+
+START_TEST(test_metadata_title_padding) {
+  cart_t cart = load_cart("../roms/tests/new_lic_code.rom");
+
+  ck_assert_str_eq(cart.rom_metadata->title, "COFFEEBREAK");
+}
+END_TEST
+
 Suite *cart_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -46,6 +80,8 @@ Suite *cart_suite(void) {
   tc_core = tcase_create("core");
   /* tcase_add_test(tc_core, test_format_cart_metadata); */
   tcase_add_test(tc_core, test_cart_metadata);
+  tcase_add_test(tc_core, test_get_licensee_name);
+  tcase_add_test(tc_core, test_metadata_title_padding);
   suite_add_tcase(s, tc_core);
 
   return s;

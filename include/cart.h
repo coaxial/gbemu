@@ -33,3 +33,5 @@ typedef struct cart {
 void format_cart_metadata(char *buf, size_t buflen, cart_metadata_t metadata);
 static void display_cart_metadata();
 cart_t load_cart(char *p_cart_path);
+const char *lookup_new_licensee_name(char *code);
+const char *get_licensee_name(u8 old_lic_code, u16 new_lic_code);
