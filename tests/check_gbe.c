@@ -11,7 +11,7 @@ START_TEST(test_cart_metadata) {
   ck_assert_uint_eq(cart.metadata->new_licensee_code, 0x00);
   ck_assert_uint_eq(cart.metadata->sgb_flag, 0x00);
   ck_assert_uint_eq(cart.metadata->cart_type, 0x01);
-  ck_assert_uint_eq(cart.metadata->rom_size, 0x01);
+  ck_assert_uint_eq(cart.metadata->rom_size_code, 0x01);
   ck_assert_uint_eq(cart.metadata->ram_size, 0x00);
   ck_assert_uint_eq(cart.metadata->destination_code, 0x00);
   ck_assert_uint_eq(cart.metadata->old_licensee_code, 0x00);
@@ -55,6 +55,24 @@ START_TEST(test_metadata_title_padding) {
 }
 END_TEST
 
+START_TEST(test_get_rom_size) {
+  u8 ROM_SIZE_CODES[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+  char *P_EXPECTED_ROM_SIZES[] = {"32KiB",  "64KiB",  "128KiB",
+                                  "256KiB", "512KiB", "1MiB",
+                                  "2MiB",   "4MiB",   "8MiB"};
+
+  for (size_t i = 0; i < (sizeof(ROM_SIZE_CODES) / sizeof(ROM_SIZE_CODES[0]));
+       i++) {
+    char *p_expected = P_EXPECTED_ROM_SIZES[i];
+
+    char p_actual[32];
+    get_human_rom_size(p_actual, sizeof(p_actual), ROM_SIZE_CODES[i]);
+
+    ck_assert_str_eq(p_actual, p_expected);
+  }
+}
+END_TEST
+
 Suite *cart_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -66,6 +84,7 @@ Suite *cart_suite(void) {
   tcase_add_test(tc_core, test_cart_metadata);
   tcase_add_test(tc_core, test_get_licensee_name);
   tcase_add_test(tc_core, test_metadata_title_padding);
+  tcase_add_test(tc_core, test_get_rom_size);
   suite_add_tcase(s, tc_core);
 
   return s;

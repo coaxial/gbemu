@@ -269,7 +269,7 @@ static new_licensee_name_t NEW_LICENSEE_NAME[] = {
     {"DK", "Kodansha"},
 };
 
-const u8 SEE_NEW_LICENSEE_CODE = 0x33;
+const u8 SEE_NEW_LICENSEE_CODE_FLAG = 0x33;
 static cart_t cart_ctx;
 
 /**
@@ -289,18 +289,18 @@ cart_t load_cart(char *p_cart_path) {
 
   fseek(rom_file, 0, SEEK_END);
 
-  cart_ctx.rom_size = ftell(rom_file);
+  cart_ctx.rom_size_bytes = ftell(rom_file);
 
   rewind(rom_file);
 
-  cart_ctx.rom = malloc(cart_ctx.rom_size);
-  fread(cart_ctx.rom, cart_ctx.rom_size, 1, rom_file);
+  cart_ctx.p_rom = malloc(cart_ctx.rom_size_bytes);
+  fread(cart_ctx.p_rom, cart_ctx.rom_size_bytes, 1, rom_file);
   fclose(rom_file);
 
   cart_ctx.metadata =
-      (cart_metadata_t *)(cart_ctx.rom + 0x100); // Metadata starts at 0x100
+      (cart_metadata_t *)(cart_ctx.p_rom + 0x100); // Metadata starts at 0x100
 
-  if (cart_ctx.metadata->old_licensee_code == SEE_NEW_LICENSEE_CODE) {
+  if (cart_ctx.metadata->old_licensee_code == SEE_NEW_LICENSEE_CODE_FLAG) {
     /* Pad the title string when using the new license code as that shrinks the
      * title string to 11 chars instead. */
     cart_ctx.metadata->title[11] = '\0';
@@ -316,9 +316,9 @@ cart_t load_cart(char *p_cart_path) {
    * endian, which reverses the bytes when loading them into a struct directly.
    * So we put them back in the original order. */
   cart_ctx.metadata->new_licensee_code =
-      (cart_ctx.rom[0x144] << 8 | cart_ctx.rom[0x145]);
+      (cart_ctx.p_rom[0x144] << 8 | cart_ctx.p_rom[0x145]);
   cart_ctx.metadata->global_checksum =
-      (cart_ctx.rom[0x14e] << 8 | cart_ctx.rom[0x14f]);
+      (cart_ctx.p_rom[0x14e] << 8 | cart_ctx.p_rom[0x14f]);
 
   return cart_ctx;
 };
@@ -329,15 +329,20 @@ cart_t load_cart(char *p_cart_path) {
  * @param buflen Length of the buffer
  * @param metadata Cartridge metadata
  */
-void format_cart_metadata(char *buf, size_t buflen, cart_metadata_t metadata) {
-  const char *licensee_name =
+void format_cart_metadata(char *p_buf, size_t buflen,
+                          cart_metadata_t metadata) {
+  const char *p_licensee_name =
       get_licensee_name(metadata.old_licensee_code, metadata.new_licensee_code);
-  snprintf(
-      buf, buflen,
-      "Cart title:\t%s (v%d)\nLicensee:\t%s (0x%04X)\nCart type:\t%s (0x%02X)",
-      metadata.title, metadata.version, licensee_name,
-      metadata.new_licensee_code, ROM_TYPES_NAMES[metadata.cart_type],
-      metadata.cart_type);
+  char p_rom_size_human[32];
+  get_human_rom_size(p_rom_size_human, sizeof(p_rom_size_human),
+                     metadata.rom_size_code);
+
+  snprintf(p_buf, buflen,
+           "Cart title:\t%s (v%d)\nLicensee:\t%s (0x%04X)\nCart type:\t%s "
+           "(0x%02X)\nROM size:\t%s (0x%02X)\n",
+           metadata.title, metadata.version, p_licensee_name,
+           metadata.new_licensee_code, ROM_TYPES_NAMES[metadata.cart_type],
+           metadata.cart_type, p_rom_size_human, metadata.rom_size_code);
 };
 
 /**
@@ -355,14 +360,15 @@ void print_cart_metadata() {
  * @param code New licensee code string
  * @return Returns the full licensee name
  */
-const char *lookup_new_licensee_name(char *code) {
+const char *lookup_new_licensee_name(char *p_code) {
   for (int i = 0; i < sizeof(NEW_LICENSEE_NAME) / sizeof(new_licensee_name_t);
        i++) {
-    if (strcmp(code, NEW_LICENSEE_NAME[i].code) == 0) {
+    if (strcmp(p_code, NEW_LICENSEE_NAME[i].code) == 0) {
       return NEW_LICENSEE_NAME[i].name;
     }
   }
 
+  /* TODO: Test this case */
   return "Unknown Licensee";
 };
 
@@ -373,7 +379,7 @@ const char *lookup_new_licensee_name(char *code) {
  * @return the full licensee name
  */
 const char *get_licensee_name(u8 old_lic_code, u16 new_lic_code) {
-  if (old_lic_code == SEE_NEW_LICENSEE_CODE) {
+  if (old_lic_code == SEE_NEW_LICENSEE_CODE_FLAG) {
     /* Turning 16 bit value into a null terminated string as the new license
      * code is a string of 2 bytes */
     char ascii_code[3] = {new_lic_code >> 8, new_lic_code & 0xFF, '\0'};
@@ -383,3 +389,23 @@ const char *get_licensee_name(u8 old_lic_code, u16 new_lic_code) {
 
   return OLD_LICENSEE_NAME[old_lic_code];
 };
+
+/**
+ * @brief Calculates the human readable ROM size from the ROM size code
+ * @param p_buf Buffer to store the human readable ROM size
+ * @param buflen Length of the buffer
+ * @param rom_size_code The ROM size code from the cart metadata
+ */
+void get_human_rom_size(char *p_buf, size_t buflen, u8 rom_size_code) {
+  /* Not considering the 0x52, 0x53, 0x54 size codes as Pan Docs says there are
+   * no known cartridges this size and these codes are likely inaccurate. */
+  if (rom_size_code <= 0x08) {
+    u16 rom_size_kib = 32 * (1 << rom_size_code);
+
+    if (rom_size_code <= 0x04) {
+      snprintf(p_buf, buflen, "%dKiB", rom_size_kib);
+    } else {
+      snprintf(p_buf, buflen, "%dMiB", rom_size_kib / 1024);
+    }
+  }
+}
