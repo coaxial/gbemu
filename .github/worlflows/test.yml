@@ -1,13 +1,17 @@
 name: Test
 on:
   push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 jobs:
-  run-tests:
-    name: Build Project
+  check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
       - run: mkdir build
 
