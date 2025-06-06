@@ -16,7 +16,7 @@ jobs:
           submodules: recursive
 
       - name: Install Dependencies
-        run: sudo apt-get update && apt-get install -y libsdl2-{,ttf-}dev build-essential, cmake, check
+        run: sudo apt-get update && sudo apt-get install -y libsdl2-{,ttf-}dev build-essential, cmake, check
 
       - run: ls -clash cmake/
 
