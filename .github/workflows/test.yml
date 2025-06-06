@@ -24,4 +24,7 @@ jobs:
         uses: threeal/cmake-action@v2.1.0
 
       - name: Run Tests
-        run: cd build && make && ./tests/check_gbe
+        run: |
+          cd build
+          make
+          ./tests/check_gbe
