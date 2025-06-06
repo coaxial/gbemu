@@ -11,7 +11,7 @@ typedef struct cart_metadata {
   u8 cart_type;
   // TODO : Implement number of banks calculation
   u8 rom_size_code;
-  u8 ram_size;
+  u8 ram_size_code;
   u8 destination_code;
   u8 old_licensee_code;
   u8 version;
@@ -32,3 +32,4 @@ cart_t load_cart(char *p_cart_path);
 const char *lookup_new_licensee_name(char *p_code);
 const char *get_licensee_name(u8 old_lic_code, u16 new_lic_code);
 void get_human_rom_size(char *p_buf, size_t buflen, u8 rom_size_code);
+int get_ram_size_kib(u8 ram_size_code);

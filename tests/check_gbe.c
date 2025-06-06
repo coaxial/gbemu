@@ -12,7 +12,7 @@ START_TEST(test_cart_metadata) {
   ck_assert_uint_eq(cart.metadata->sgb_flag, 0x00);
   ck_assert_uint_eq(cart.metadata->cart_type, 0x01);
   ck_assert_uint_eq(cart.metadata->rom_size_code, 0x01);
-  ck_assert_uint_eq(cart.metadata->ram_size, 0x00);
+  ck_assert_uint_eq(cart.metadata->ram_size_code, 0x00);
   ck_assert_uint_eq(cart.metadata->destination_code, 0x00);
   ck_assert_uint_eq(cart.metadata->old_licensee_code, 0x00);
   ck_assert_uint_eq(cart.metadata->version, 0x00);
@@ -73,6 +73,21 @@ START_TEST(test_get_rom_size) {
 }
 END_TEST
 
+START_TEST(test_get_ram_size) {
+  u8 RAM_SIZE_CODES[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05};
+  int EXPECTED_RAM_SIZES[] = {0, -1, 8, 32, 128, 64};
+
+  for (size_t i = 0; i < (sizeof(RAM_SIZE_CODES) / sizeof(RAM_SIZE_CODES[0]));
+       i++) {
+    int expected = EXPECTED_RAM_SIZES[i];
+
+    int actual = get_ram_size_kib(RAM_SIZE_CODES[i]);
+
+    ck_assert_int_eq(actual, expected);
+  }
+}
+END_TEST
+
 Suite *cart_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -85,6 +100,7 @@ Suite *cart_suite(void) {
   tcase_add_test(tc_core, test_get_licensee_name);
   tcase_add_test(tc_core, test_metadata_title_padding);
   tcase_add_test(tc_core, test_get_rom_size);
+  tcase_add_test(tc_core, test_get_ram_size);
   suite_add_tcase(s, tc_core);
 
   return s;

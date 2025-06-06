@@ -269,6 +269,8 @@ static new_licensee_name_t NEW_LICENSEE_NAME[] = {
     {"DK", "Kodansha"},
 };
 
+const int RAM_SIZES_KIB[] = {0, -1, 8, 32, 128, 64};
+
 const u8 SEE_NEW_LICENSEE_CODE_FLAG = 0x33;
 static cart_t cart_ctx;
 
@@ -339,10 +341,11 @@ void format_cart_metadata(char *p_buf, size_t buflen,
 
   snprintf(p_buf, buflen,
            "Cart title:\t%s (v%d)\nLicensee:\t%s (0x%04X)\nCart type:\t%s "
-           "(0x%02X)\nROM size:\t%s (0x%02X)\n",
+           "(0x%02X)\nROM size:\t%s (0x%02X)\nRAM size:\t%dKiB (0x%02X)\n",
            metadata.title, metadata.version, p_licensee_name,
            metadata.new_licensee_code, ROM_TYPES_NAMES[metadata.cart_type],
-           metadata.cart_type, p_rom_size_human, metadata.rom_size_code);
+           metadata.cart_type, p_rom_size_human, metadata.rom_size_code,
+           get_ram_size_kib(metadata.ram_size_code), metadata.ram_size_code);
 };
 
 /**
@@ -409,3 +412,10 @@ void get_human_rom_size(char *p_buf, size_t buflen, u8 rom_size_code) {
     }
   }
 }
+
+/**
+ * @brief Calculates the RAM size in KiB from the RAM size code
+ * @param ram_size_code The RAM size code from the cart metadata
+ * @return The RAM size in KiB
+ */
+int get_ram_size_kib(u8 ram_size_code) { return RAM_SIZES_KIB[ram_size_code]; };
