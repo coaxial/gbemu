@@ -12,11 +12,19 @@ jobs:
     steps:
       - name: Checkout Project
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - run: mkdir build
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-{,ttf-}dev build-essential cmake check
 
       - name: Build Project
         uses: threeal/cmake-action@v2.1.0
 
       - name: Run Tests
-        run: cd build && ./check_gbe
+        run: |
+          cd build
+          make
+          ./tests/check_gbe
