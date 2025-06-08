@@ -3,7 +3,11 @@
 #include <stdlib.h>
 
 #include "cart.h"
+#include "cpu.h"
 
+/**
+ * Cart Test Suite
+ */
 START_TEST(test_cart_metadata) {
   cart_t cart = load_cart("../roms/tests/blargg/cpu_instrs.gb");
 
@@ -95,7 +99,6 @@ Suite *cart_suite(void) {
   s = suite_create("cart");
 
   tc_core = tcase_create("core");
-  /* tcase_add_test(tc_core, test_format_cart_metadata); */
   tcase_add_test(tc_core, test_cart_metadata);
   tcase_add_test(tc_core, test_get_licensee_name);
   tcase_add_test(tc_core, test_metadata_title_padding);
@@ -106,13 +109,84 @@ Suite *cart_suite(void) {
   return s;
 }
 
+/**
+ * CPU Test Suite
+ */
+START_TEST(test_set_get_reg_pair) {
+  registers_t regs = {
+      .a = 0xBA,
+      .b = 0xBE,
+      .c = 0xBA,
+      .d = 0xBE,
+      .e = 0xBA,
+      .f = 0xBE,
+      .h = 0xBA,
+      .l = 0xBE,
+  };
+  reg_pair_t reg_pairs[] = {
+      REG_PAIR_AF,
+      REG_PAIR_BC,
+      REG_PAIR_DE,
+      REG_PAIR_HL,
+  };
+  u16 expected = 0xCAFE;
+
+  for (int i = 0; i < sizeof(reg_pairs) / sizeof(reg_pair_t); i++) {
+    bool success = set_reg_pair(&regs, reg_pairs[i], expected);
+    u16 actual = get_reg_pair(&regs, reg_pairs[i]);
+
+    ck_assert(success);
+    ck_assert_uint_eq(actual, expected);
+  };
+}
+END_TEST
+
+START_TEST(test_set_reg_pair_invalid) {
+  registers_t regs;
+
+  bool expected = false;
+  bool actual = set_reg_pair(&regs, 0x05, 0xCAFE);
+
+  ck_assert(expected == actual);
+}
+END_TEST
+
+START_TEST(test_get_reg_pair_invalid) {
+  registers_t regs;
+
+  int invalid_pair = 42;
+  bool expected = INVALID_REG_PAIR;
+  bool actual = get_reg_pair(&regs, invalid_pair);
+
+  ck_assert(expected == actual);
+}
+END_TEST
+
+Suite *cpu_suite(void) {
+  Suite *s;
+  TCase *tc_core;
+
+  s = suite_create("cpu");
+
+  tc_core = tcase_create("core");
+  tcase_add_test(tc_core, test_set_get_reg_pair);
+  tcase_add_test(tc_core, test_set_reg_pair_invalid);
+  tcase_add_test(tc_core, test_get_reg_pair_invalid);
+  suite_add_tcase(s, tc_core);
+
+  return s;
+}
+
 int main(void) {
   int number_failed;
   Suite *s;
+  Suite *s1;
   SRunner *sr;
 
   s = cart_suite();
+  s1 = cpu_suite();
   sr = srunner_create(s);
+  srunner_add_suite(sr, s1);
 
   srunner_run_all(sr, CK_NORMAL);
   number_failed = srunner_ntests_failed(sr);
