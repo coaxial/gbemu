@@ -9,29 +9,29 @@ typedef enum { REG_PAIR_AF, REG_PAIR_BC, REG_PAIR_DE, REG_PAIR_HL } reg_pair_t;
 const int INVALID_REG_PAIR = false;
 
 /**
- * @brief Combined register accessor
- * @param regs Pointer to registers
+ * @brief Combined register setter
+ * @param p_regs Pointer to registers
  * @param pair Register pair code
- * @param value 16-bit value to set
- * @return true if successful, false otherwise
+ * @return 16-bit value of register pair or false if invalid
  */
-static inline bool set_reg_pair(registers_t *regs, reg_pair_t pair, u16 value) {
+static inline bool set_reg_pair(registers_t *p_regs, reg_pair_t pair,
+                                u16 value) {
   switch (pair) {
   case REG_PAIR_AF:
-    regs->a = (value >> 8) & 0xFF;
-    regs->f = value & 0xFF;
+    p_regs->a = (value >> 8) & 0xFF;
+    p_regs->f = value & 0xFF;
     break;
   case REG_PAIR_BC:
-    regs->b = (value >> 8) & 0xFF;
-    regs->c = value & 0xFF;
+    p_regs->b = (value >> 8) & 0xFF;
+    p_regs->c = value & 0xFF;
     break;
   case REG_PAIR_DE:
-    regs->d = (value >> 8) & 0xFF;
-    regs->e = value & 0xFF;
+    p_regs->d = (value >> 8) & 0xFF;
+    p_regs->e = value & 0xFF;
     break;
   case REG_PAIR_HL:
-    regs->h = (value >> 8) & 0xFF;
-    regs->l = value & 0xFF;
+    p_regs->h = (value >> 8) & 0xFF;
+    p_regs->l = value & 0xFF;
     break;
   default:
     return INVALID_REG_PAIR;
@@ -40,21 +40,22 @@ static inline bool set_reg_pair(registers_t *regs, reg_pair_t pair, u16 value) {
 }
 
 /**
- * @brief Combined register setter
- * @param regs Pointer to registers
+ * @brief Combined register getter
+ * @param p_regs Pointer to registers
  * @param pair Register pair code
- * @return 16-bit value of register pair or false if invalid
+ * @param value 16-bit value to set
+ * @return true if successful, false otherwise
  */
-static inline u16 get_reg_pair(const registers_t *regs, reg_pair_t pair) {
+static inline u16 get_reg_pair(const registers_t *p_regs, reg_pair_t pair) {
   switch (pair) {
   case REG_PAIR_AF:
-    return ((u16)regs->a << 8) | regs->f;
+    return ((u16)p_regs->a << 8) | p_regs->f;
   case REG_PAIR_BC:
-    return ((u16)regs->b << 8) | regs->c;
+    return ((u16)p_regs->b << 8) | p_regs->c;
   case REG_PAIR_DE:
-    return ((u16)regs->d << 8) | regs->e;
+    return ((u16)p_regs->d << 8) | p_regs->e;
   case REG_PAIR_HL:
-    return ((u16)regs->h << 8) | regs->l;
+    return ((u16)p_regs->h << 8) | p_regs->l;
   default:
     return INVALID_REG_PAIR;
   }
