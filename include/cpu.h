@@ -6,7 +6,7 @@ typedef struct registers {
 
 typedef enum { REG_PAIR_AF, REG_PAIR_BC, REG_PAIR_DE, REG_PAIR_HL } reg_pair_t;
 
-const int INVALID_REG_PAIR = false;
+const bool INVALID_REG_PAIR = false;
 
 /**
  * @brief Combined register setter
