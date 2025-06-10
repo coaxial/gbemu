@@ -417,3 +417,5 @@ void get_human_rom_size(char *buf_p, size_t buflen, u8 rom_size_code) {
  * @return The RAM size in KiB
  */
 int get_ram_size_kib(u8 ram_size_code) { return RAM_SIZES_KIB[ram_size_code]; };
+
+u8 cart_read(u16 addr) { return ctx.rom_p[addr]; };

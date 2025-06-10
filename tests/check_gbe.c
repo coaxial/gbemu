@@ -1,11 +1,12 @@
 #include <check.h>
 #include <stdlib.h>
 
+#include "bus.h"
 #include "cart.h"
 #include "cpu.h"
 
 /**
- * Cart Test Suite
+ * Cart tests
  */
 START_TEST(test_cart_metadata) {
   cart_t cart = load_cart("../roms/tests/blargg/cpu_instrs.gb");
@@ -92,7 +93,7 @@ START_TEST(test_get_ram_size) {
 END_TEST
 
 /**
- * CPU Test Suite (registers)
+ * CPU tests
  */
 START_TEST(test_set_get_reg_pair) {
   registers_t regs = {
@@ -209,9 +210,21 @@ START_TEST(test_cpu_init) {
 }
 END_TEST
 
+/**
+ * Bus Tests
+ */
+START_TEST(test_bus_read) {
+  cart_t cart = load_cart("../roms/tests/blargg/cpu_instrs.gb");
+  u8 expected = 0x39;
+  u8 actual = bus_read(0x0300);
+
+  ck_assert_uint_eq(actual, expected);
+}
+END_TEST
+
 Suite *gbemu_suite(void) {
   Suite *s;
-  TCase *tc_cart, *tc_cpu;
+  TCase *tc_cart, *tc_cpu, *tc_bus;
 
   s = suite_create("gbemu");
 
@@ -234,6 +247,11 @@ Suite *gbemu_suite(void) {
   tcase_add_test(tc_cpu, test_get_flag_invalid);
   tcase_add_test(tc_cpu, test_cpu_init);
   suite_add_tcase(s, tc_cpu);
+
+  /* Bus tests */
+  tc_bus = tcase_create("Bus");
+  tcase_add_test(tc_bus, test_bus_read);
+  suite_add_tcase(s, tc_bus);
 
   return s;
 }
