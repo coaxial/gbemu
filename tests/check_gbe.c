@@ -1,5 +1,4 @@
 #include <check.h>
-#include <emu.h>
 #include <stdlib.h>
 
 #include "cart.h"
@@ -218,6 +217,15 @@ START_TEST(test_get_flag_invalid) {
 }
 END_TEST
 
+START_TEST(test_cpu_init) {
+  cpu_ctx_t ctx = {};
+  cpu_init(&ctx);
+
+  ck_assert_uint_eq(ctx.regs.pc, 0x100);
+  ck_assert_uint_eq(ctx.regs.a, 0x01);
+}
+END_TEST
+
 Suite *cpu_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -231,6 +239,7 @@ Suite *cpu_suite(void) {
   tcase_add_test(tc_core, test_set_flags);
   tcase_add_test(tc_core, test_get_flags);
   tcase_add_test(tc_core, test_get_flag_invalid);
+  tcase_add_test(tc_core, test_cpu_init);
   suite_add_tcase(s, tc_core);
 
   return s;

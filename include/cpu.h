@@ -9,8 +9,8 @@ typedef struct registers {
 
 typedef enum { REG_PAIR_AF, REG_PAIR_BC, REG_PAIR_DE, REG_PAIR_HL } reg_pair_t;
 
-const bool INVALID_REG_PAIR = false;
-const bool INVALID_FLAG_CODE = false;
+static const bool INVALID_REG_PAIR = false;
+static const bool INVALID_FLAG_CODE = false;
 
 typedef enum { FLAG_ZERO, FLAG_SUBTRACT, FLAG_HALF_CARRY, FLAG_CARRY } flag_t;
 
