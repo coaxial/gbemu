@@ -162,6 +162,46 @@ START_TEST(test_get_reg_pair_invalid) {
 }
 END_TEST
 
+START_TEST(test_set_flags) {
+  const int INVALID_FLAG_CODE = FLAG_CARRY + 1;
+  const int FLAG_CODES[] = {
+      FLAG_ZERO, FLAG_SUBTRACT, FLAG_HALF_CARRY, FLAG_CARRY, INVALID_FLAG_CODE,
+  };
+
+  u8 expected[] = {
+      0b01110000, 0b10110000, 0b11010000, 0b11100000, 0b11110000,
+  };
+
+  for (int i = 0; i < (sizeof(expected) / sizeof(u8)); i++) {
+    registers_t regs = {.f = 0xF0};
+
+    set_flag(&regs, FLAG_CODES[i], false);
+    u8 actual = regs.f;
+
+    ck_assert_uint_eq(actual, expected[i]);
+  };
+};
+END_TEST
+
+START_TEST(test_get_flags) {
+  const int INVALID_FLAG_CODE = FLAG_CARRY + 1;
+  const int FLAG_CODES[] = {
+      FLAG_ZERO, FLAG_SUBTRACT, FLAG_HALF_CARRY, FLAG_CARRY, INVALID_FLAG_CODE,
+  };
+
+  for (int i = 0; i < (sizeof(FLAG_CODES) / sizeof(int)); i++) {
+    registers_t regs = {.f = 0x00};
+
+    set_flag(&regs, FLAG_CODES[i], true);
+    bool actual = get_flag(&regs, FLAG_CODES[i]);
+    bool expected = i <= 3; /* Flag code 4 is an invalid flag and should return
+                               false instead of true */
+
+    ck_assert_msg(actual == expected, "Failed for flag code %i", FLAG_CODES[i]);
+  };
+}
+END_TEST
+
 Suite *cpu_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -172,6 +212,9 @@ Suite *cpu_suite(void) {
   tcase_add_test(tc_core, test_set_get_reg_pair);
   tcase_add_test(tc_core, test_set_reg_pair_invalid);
   tcase_add_test(tc_core, test_get_reg_pair_invalid);
+  tcase_add_test(tc_core, test_set_flags);
+  tcase_add_test(tc_core, test_get_flags);
+  /* tcase_add_test(tc_core, test_get_flags); */
   suite_add_tcase(s, tc_core);
 
   return s;
