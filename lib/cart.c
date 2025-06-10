@@ -272,7 +272,7 @@ static new_licensee_name_t NEW_LICENSEE_NAME[] = {
 const int RAM_SIZES_KIB[] = {0, -1, 8, 32, 128, 64};
 
 const u8 SEE_NEW_LICENSEE_CODE_FLAG = 0x33;
-static cart_t cart_ctx;
+static cart_t ctx;
 
 /**
  * @brief Load a cartridge from a path
@@ -280,49 +280,47 @@ static cart_t cart_ctx;
  * @return returns a cart_t struct containing a representation of the cartridge
  */
 cart_t load_cart(char *p_cart_path) {
-  strncpy(cart_ctx.filename, p_cart_path, sizeof(cart_ctx.filename) - 1);
+  strncpy(ctx.filename, p_cart_path, sizeof(ctx.filename) - 1);
 
-  FILE *rom_file = fopen(cart_ctx.filename, "rb");
+  FILE *rom_file = fopen(ctx.filename, "rb");
 
   if (rom_file == NULL) {
-    printf("Error opening file: %s\n", cart_ctx.filename);
+    printf("Error opening file: %s\n", ctx.filename);
     exit(1);
   }
 
   fseek(rom_file, 0, SEEK_END);
 
-  cart_ctx.rom_size_bytes = ftell(rom_file);
+  ctx.rom_size_bytes = ftell(rom_file);
 
   rewind(rom_file);
 
-  cart_ctx.p_rom = malloc(cart_ctx.rom_size_bytes);
-  fread(cart_ctx.p_rom, cart_ctx.rom_size_bytes, 1, rom_file);
+  ctx.p_rom = malloc(ctx.rom_size_bytes);
+  fread(ctx.p_rom, ctx.rom_size_bytes, 1, rom_file);
   fclose(rom_file);
 
-  cart_ctx.metadata =
-      (cart_metadata_t *)(cart_ctx.p_rom + 0x100); // Metadata starts at 0x100
+  ctx.metadata =
+      (cart_metadata_t *)(ctx.p_rom + 0x100); // Metadata starts at 0x100
 
-  if (cart_ctx.metadata->old_licensee_code == SEE_NEW_LICENSEE_CODE_FLAG) {
+  if (ctx.metadata->old_licensee_code == SEE_NEW_LICENSEE_CODE_FLAG) {
     /* Pad the title string when using the new license code as that shrinks the
      * title string to 11 chars instead. */
-    cart_ctx.metadata->title[11] = '\0';
-    cart_ctx.metadata->title[12] = '\0';
-    cart_ctx.metadata->title[13] = '\0';
-    cart_ctx.metadata->title[14] = '\0';
+    ctx.metadata->title[11] = '\0';
+    ctx.metadata->title[12] = '\0';
+    ctx.metadata->title[13] = '\0';
+    ctx.metadata->title[14] = '\0';
   };
 
   /* Terminate the title string in case it isn't for some reason */
-  cart_ctx.metadata->title[15] = '\0';
+  ctx.metadata->title[15] = '\0';
 
   /* These 16 bits values are big endian in the ROM. Intel CPUs are little
    * endian, which reverses the bytes when loading them into a struct directly.
    * So we put them back in the original order. */
-  cart_ctx.metadata->new_licensee_code =
-      (cart_ctx.p_rom[0x144] << 8 | cart_ctx.p_rom[0x145]);
-  cart_ctx.metadata->global_checksum =
-      (cart_ctx.p_rom[0x14e] << 8 | cart_ctx.p_rom[0x14f]);
+  ctx.metadata->new_licensee_code = (ctx.p_rom[0x144] << 8 | ctx.p_rom[0x145]);
+  ctx.metadata->global_checksum = (ctx.p_rom[0x14e] << 8 | ctx.p_rom[0x14f]);
 
-  return cart_ctx;
+  return ctx;
 };
 
 /**
@@ -353,7 +351,7 @@ void format_cart_metadata(char *p_buf, size_t buflen,
  */
 void print_cart_metadata() {
   char metadata_buf[1024];
-  format_cart_metadata(metadata_buf, sizeof(metadata_buf), *cart_ctx.metadata);
+  format_cart_metadata(metadata_buf, sizeof(metadata_buf), *ctx.metadata);
 
   printf("%s\n", metadata_buf);
 };
