@@ -214,7 +214,6 @@ Suite *cpu_suite(void) {
   tcase_add_test(tc_core, test_get_reg_pair_invalid);
   tcase_add_test(tc_core, test_set_flags);
   tcase_add_test(tc_core, test_get_flags);
-  /* tcase_add_test(tc_core, test_get_flags); */
   suite_add_tcase(s, tc_core);
 
   return s;
