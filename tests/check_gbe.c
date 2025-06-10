@@ -91,25 +91,8 @@ START_TEST(test_get_ram_size) {
 }
 END_TEST
 
-Suite *cart_suite(void) {
-  Suite *s;
-  TCase *tc_core;
-
-  s = suite_create("cart");
-
-  tc_core = tcase_create("core");
-  tcase_add_test(tc_core, test_cart_metadata);
-  tcase_add_test(tc_core, test_get_licensee_name);
-  tcase_add_test(tc_core, test_metadata_title_padding);
-  tcase_add_test(tc_core, test_get_rom_size);
-  tcase_add_test(tc_core, test_get_ram_size);
-  suite_add_tcase(s, tc_core);
-
-  return s;
-}
-
 /**
- * CPU Test Suite
+ * CPU Test Suite (registers)
  */
 START_TEST(test_set_get_reg_pair) {
   registers_t regs = {
@@ -226,21 +209,31 @@ START_TEST(test_cpu_init) {
 }
 END_TEST
 
-Suite *cpu_suite(void) {
+Suite *gbemu_suite(void) {
   Suite *s;
-  TCase *tc_core;
+  TCase *tc_cart, *tc_cpu;
 
-  s = suite_create("cpu");
+  s = suite_create("gbemu");
 
-  tc_core = tcase_create("core");
-  tcase_add_test(tc_core, test_set_get_reg_pair);
-  tcase_add_test(tc_core, test_set_reg_pair_invalid);
-  tcase_add_test(tc_core, test_get_reg_pair_invalid);
-  tcase_add_test(tc_core, test_set_flags);
-  tcase_add_test(tc_core, test_get_flags);
-  tcase_add_test(tc_core, test_get_flag_invalid);
-  tcase_add_test(tc_core, test_cpu_init);
-  suite_add_tcase(s, tc_core);
+  /* Cart tests */
+  tc_cart = tcase_create("Cart");
+  tcase_add_test(tc_cart, test_cart_metadata);
+  tcase_add_test(tc_cart, test_get_licensee_name);
+  tcase_add_test(tc_cart, test_metadata_title_padding);
+  tcase_add_test(tc_cart, test_get_rom_size);
+  tcase_add_test(tc_cart, test_get_ram_size);
+  suite_add_tcase(s, tc_cart);
+
+  /* CPU tests */
+  tc_cpu = tcase_create("CPU");
+  tcase_add_test(tc_cpu, test_set_get_reg_pair);
+  tcase_add_test(tc_cpu, test_set_reg_pair_invalid);
+  tcase_add_test(tc_cpu, test_get_reg_pair_invalid);
+  tcase_add_test(tc_cpu, test_set_flags);
+  tcase_add_test(tc_cpu, test_get_flags);
+  tcase_add_test(tc_cpu, test_get_flag_invalid);
+  tcase_add_test(tc_cpu, test_cpu_init);
+  suite_add_tcase(s, tc_cpu);
 
   return s;
 }
@@ -248,15 +241,12 @@ Suite *cpu_suite(void) {
 int main(void) {
   int number_failed;
   Suite *s;
-  Suite *s1;
   SRunner *sr;
 
-  s = cart_suite();
-  s1 = cpu_suite();
+  s = gbemu_suite();
   sr = srunner_create(s);
-  srunner_add_suite(sr, s1);
 
-  srunner_run_all(sr, CK_NORMAL);
+  srunner_run_all(sr, CK_ENV);
   number_failed = srunner_ntests_failed(sr);
   srunner_free(sr);
   return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
