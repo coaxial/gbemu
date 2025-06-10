@@ -7,6 +7,9 @@ typedef struct registers {
 typedef enum { REG_PAIR_AF, REG_PAIR_BC, REG_PAIR_DE, REG_PAIR_HL } reg_pair_t;
 
 const bool INVALID_REG_PAIR = false;
+const bool INVALID_FLAG_CODE = false;
+
+typedef enum { FLAG_ZERO, FLAG_SUBTRACT, FLAG_HALF_CARRY, FLAG_CARRY } flag_t;
 
 /**
  * @brief Combined register setter
@@ -60,3 +63,48 @@ static inline u16 get_reg_pair(const registers_t *p_regs, reg_pair_t pair) {
     return INVALID_REG_PAIR;
   }
 }
+
+/**
+ * @brief Get a specific flag
+ * @param p_regs Pointer to registers
+ * @param flag Flag code
+ * @return true if flag is set, false otherwise, and false if invalid flag.
+ */
+static inline bool get_flag(const registers_t *p_regs, flag_t flag) {
+  switch (flag) {
+  case FLAG_ZERO:
+  case FLAG_SUBTRACT:
+  case FLAG_HALF_CARRY:
+  case FLAG_CARRY:
+    return (p_regs->f & (1U << (7 - flag)));
+  default:
+    return INVALID_FLAG_CODE;
+  }
+};
+
+/**
+ * @brief Set a specific flag
+ * @param p_regs Pointer to registers
+ * @param flag Flag code
+ * @param value Value to set (one bit)
+ * @return true if successful, false otherwise
+ */
+static inline bool set_flag(registers_t *p_regs, flag_t flag, bool value) {
+  switch (flag) {
+  case FLAG_ZERO:
+  case FLAG_SUBTRACT:
+  case FLAG_HALF_CARRY:
+  case FLAG_CARRY:
+    /**
+     * 1U << (7 - flag) is creating a mask which is then inverted with ~ so that
+     * we only select the bit to change. This is then ORed with `true`
+     * shifted left by the same amount to set the bit value.
+     * This is so that only the bit corresponding to the flag is
+     * changed, without affecting the other bits.
+     */
+    p_regs->f = (p_regs->f & ~(1U << (7 - flag))) | (value << (7 - flag));
+    return true;
+  default:
+    return false;
+  }
+};
