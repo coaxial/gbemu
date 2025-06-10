@@ -1,15 +1,22 @@
+#pragma once
+
 #include "common.h"
 
 typedef struct registers {
   u8 a, b, c, d, e, f, h, l;
+  u16 pc, sp;
 } registers_t;
 
 typedef enum { REG_PAIR_AF, REG_PAIR_BC, REG_PAIR_DE, REG_PAIR_HL } reg_pair_t;
 
-const bool INVALID_REG_PAIR = false;
-const bool INVALID_FLAG_CODE = false;
+static const bool INVALID_REG_PAIR = false;
+static const bool INVALID_FLAG_CODE = false;
 
 typedef enum { FLAG_ZERO, FLAG_SUBTRACT, FLAG_HALF_CARRY, FLAG_CARRY } flag_t;
+
+typedef struct ctx {
+  registers_t regs;
+} cpu_ctx_t;
 
 /**
  * @brief Combined register setter
@@ -108,3 +115,5 @@ static inline bool set_flag(registers_t *p_regs, flag_t flag, bool value) {
     return false;
   }
 };
+
+void cpu_init(cpu_ctx_t *p_ctx);

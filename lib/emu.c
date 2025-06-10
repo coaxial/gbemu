@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "cart.h"
+#include "cpu.h"
 
 int emu_run(int argc, char *argv[]) {
   if (argc < 2) {
@@ -16,6 +17,8 @@ int emu_run(int argc, char *argv[]) {
 
   cart_t cart = load_cart(argv[1]);
   print_cart_metadata();
+
+  cpu_init(NULL);
 
   return 0;
 }
