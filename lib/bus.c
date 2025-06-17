@@ -17,6 +17,11 @@
  * 0xFFFF - 0xFFFF: Interrupt Enable Register
  */
 
+/**
+ * @brief Reads a byte from the bus
+ * @param addr Address to read from
+ * @return The byte at the address or 0xFF if the address is invalid
+ */
 u8 bus_read(u16 addr) {
   if (addr < 0x8000) {
     return cart_read(addr);
@@ -24,11 +29,17 @@ u8 bus_read(u16 addr) {
 
   return 0xFF;
 };
-void bus_write(u16 addr, u8 value) {
-  /* TODO: Implement me */
-};
 
-u16 bus_read_word(u16 addr) { return 0xFFFF; };
-void bus_write_word(u16 addr, u16 value) {
-  /* TODO: Implement me */
+/**
+ * @brief Writes a byte to the bus
+ * @param addr Address to write to
+ * @param value Value to write
+ * @return true if the write was successful
+ */
+bool bus_write(u16 addr, u8 value) {
+  if (addr < 0x8000) {
+    return cart_write(addr, value);
+  }
+
+  return false;
 };

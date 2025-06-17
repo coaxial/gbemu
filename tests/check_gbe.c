@@ -222,6 +222,24 @@ START_TEST(test_bus_read) {
 }
 END_TEST
 
+START_TEST(test_bus_write) {
+  cart_t cart = load_cart("../roms/tests/blargg/cpu_instrs.gb");
+  u8 expected = 0xCA;
+  bool success = bus_write(0x0300, expected);
+  u8 actual = bus_read(0x0300);
+
+  ck_assert(success);
+  ck_assert_uint_eq(actual, expected);
+}
+END_TEST
+
+START_TEST(test_bus_write_invalid) {
+  cart_t cart = load_cart("../roms/tests/blargg/cpu_instrs.gb");
+  bool actual = bus_write(0x8000, 0xCA);
+
+  ck_assert(actual == false);
+}
+
 Suite *gbemu_suite(void) {
   Suite *s;
   TCase *tc_cart, *tc_cpu, *tc_bus;
@@ -251,6 +269,8 @@ Suite *gbemu_suite(void) {
   /* Bus tests */
   tc_bus = tcase_create("Bus");
   tcase_add_test(tc_bus, test_bus_read);
+  tcase_add_test(tc_bus, test_bus_write);
+  tcase_add_test(tc_bus, test_bus_write_invalid);
   suite_add_tcase(s, tc_bus);
 
   return s;

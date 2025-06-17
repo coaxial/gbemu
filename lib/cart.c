@@ -418,4 +418,21 @@ void get_human_rom_size(char *buf_p, size_t buflen, u8 rom_size_code) {
  */
 int get_ram_size_kib(u8 ram_size_code) { return RAM_SIZES_KIB[ram_size_code]; };
 
+/**
+ * @brief Reads a byte from the cartridge
+ * @param addr Address to read from
+ * @return The byte at the address
+ */
 u8 cart_read(u16 addr) { return ctx.rom_p[addr]; };
+
+/**
+ * @brief Writes a byte to the cartridge
+ * @param addr Address to write to
+ * @param value Value to write
+ * @return true if the write was successful
+ */
+bool cart_write(u16 addr, u8 value) {
+  ctx.rom_p[addr] = value;
+
+  return ctx.rom_p[addr] == value;
+};

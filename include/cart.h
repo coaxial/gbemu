@@ -36,3 +36,4 @@ const char *get_licensee_name(u8 old_lic_code, u16 new_lic_code);
 void get_human_rom_size(char *buf_p, size_t buflen, u8 rom_size_code);
 int get_ram_size_kib(u8 ram_size_code);
 u8 cart_read(u16 addr);
+bool cart_write(u16 addr, u8 value);
