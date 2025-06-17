@@ -3,7 +3,7 @@
 
 /**
  * Gameboy Memory Map
- * 0x0000 - 0x3FFF: 16 KiBROM Bank 00                 Read Only
+ * 0x0000 - 0x3FFF: 16 KiB ROM Bank 00                 Read Only
  * 0x4000 - 0x7FFF: 16 KiB ROM Bank 01-7F, switchable Read Only
  * 0x8000 - 0x9FFF: Video RAM (VRAM)                  Read/Write
  * 0xA000 - 0xBFFF: External RAM                      Read/Write
@@ -23,6 +23,7 @@
  * @return The byte at the address or 0xFF if the address is invalid
  */
 u8 bus_read(u16 addr) {
+  /* FIXME: Not handling bank switching for now */
   if (addr < 0x8000) {
     return cart_read(addr);
   }
@@ -37,9 +38,6 @@ u8 bus_read(u16 addr) {
  * @return true if the write was successful
  */
 bool bus_write(u16 addr, u8 value) {
-  if (addr < 0x8000) {
-    return cart_write(addr, value);
-  }
-
+  /* TODO: Implement writes */
   return false;
 };
