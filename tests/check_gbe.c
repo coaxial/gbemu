@@ -95,6 +95,31 @@ END_TEST
 /**
  * CPU tests
  */
+START_TEST(test_set_get_reg) {
+  registers_t regs = {
+      .a = 0xBA,
+      .b = 0xBE,
+      .c = 0xBA,
+      .d = 0xBE,
+      .e = 0xBA,
+      .f = 0xBE,
+      .h = 0xBA,
+      .l = 0xBE,
+  };
+  register_types_t reg_types[] = {
+      RT_A, RT_B, RT_C, RT_D, RT_E, RT_F, RT_H, RT_L,
+  };
+  u8 expected = 0xCA;
+
+  for (int i = 0; i < sizeof(reg_types) / sizeof(register_types_t); i++) {
+    bool success = set_reg(&regs, reg_types[i], expected);
+    u8 actual = get_reg(&regs, reg_types[i]);
+
+    ck_assert(success);
+    ck_assert_uint_eq(actual, expected);
+  };
+}
+
 START_TEST(test_set_get_reg_pair) {
   registers_t regs = {
       .a = 0xBA,
@@ -106,15 +131,15 @@ START_TEST(test_set_get_reg_pair) {
       .h = 0xBA,
       .l = 0xBE,
   };
-  reg_pair_t reg_pairs[] = {
-      REG_PAIR_AF,
-      REG_PAIR_BC,
-      REG_PAIR_DE,
-      REG_PAIR_HL,
+  register_types_t reg_pairs[] = {
+      RT_AF,
+      RT_BC,
+      RT_DE,
+      RT_HL,
   };
   u16 expected = 0xCAFE;
 
-  for (int i = 0; i < sizeof(reg_pairs) / sizeof(reg_pair_t); i++) {
+  for (int i = 0; i < sizeof(reg_pairs) / sizeof(register_types_t); i++) {
     bool success = set_reg_pair(&regs, reg_pairs[i], expected);
     u16 actual = get_reg_pair(&regs, reg_pairs[i]);
 
@@ -123,6 +148,16 @@ START_TEST(test_set_get_reg_pair) {
   };
 }
 END_TEST
+
+START_TEST(test_get_reg_invalid) {
+  registers_t regs;
+
+  int invalid_reg = 42;
+  u8 expected = 0xFF;
+  u8 actual = get_reg(&regs, invalid_reg);
+
+  ck_assert_uint_eq(actual, expected);
+}
 
 START_TEST(test_set_reg_pair_invalid) {
   registers_t regs;
@@ -138,13 +173,12 @@ START_TEST(test_get_reg_pair_invalid) {
   registers_t regs;
 
   int invalid_pair = 42;
-  bool expected = INVALID_REG_PAIR;
+  bool expected = 0xFFFF;
   bool actual = get_reg_pair(&regs, invalid_pair);
 
   ck_assert(expected == actual);
 }
 END_TEST
-
 START_TEST(test_set_flags) {
   const int INVALID_FLAG_CODE = 42;
   const int FLAG_CODES[] = {
@@ -259,8 +293,10 @@ Suite *gbemu_suite(void) {
 
   /* CPU tests */
   tc_cpu = tcase_create("CPU");
+  tcase_add_test(tc_cpu, test_set_get_reg);
   tcase_add_test(tc_cpu, test_set_get_reg_pair);
   tcase_add_test(tc_cpu, test_set_reg_pair_invalid);
+  tcase_add_test(tc_cpu, test_get_reg_invalid);
   tcase_add_test(tc_cpu, test_get_reg_pair_invalid);
   tcase_add_test(tc_cpu, test_set_flags);
   tcase_add_test(tc_cpu, test_get_flags);

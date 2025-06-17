@@ -22,3 +22,6 @@ int emu_run(int argc, char *argv[]) {
 
   return 0;
 }
+
+/* TODO: Implement this */
+void emu_cycles(int count) {}

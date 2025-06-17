@@ -7,7 +7,7 @@
  * set when combined with the addressing modes (below).
  */
 typedef enum instruction_families {
-  IN_NONE,
+  IN_NONE, // Error handling, if param omitted
   IN_NOP,
   IN_LD,
   IN_INC,
@@ -55,7 +55,7 @@ typedef enum instruction_families {
   IN_SRL,
   IN_BIT,
   IN_RES,
-  IN_SET
+  IN_SET,
 } instruction_families_t;
 
 /**
@@ -94,7 +94,7 @@ typedef enum addressing_modes {
   AM_MR_D8,
   AM_MR,
   AM_A16_R,
-  AM_R_A16
+  AM_R_A16,
 } addressing_modes_t;
 
 /**
@@ -120,7 +120,7 @@ typedef enum register_types {
   RT_DE,
   RT_HL,
   RT_SP,
-  RT_PC
+  RT_PC,
 } register_types_t;
 
 /**
@@ -137,7 +137,7 @@ typedef enum condition_types {
   CT_NZ,
   CT_Z,
   CT_NC,
-  CT_C
+  CT_C,
 } condition_types_t;
 
 /**
@@ -152,3 +152,5 @@ typedef struct instruction {
   condition_types_t cond;
   u8 param;
 } instruction_t;
+
+instruction_t *instruction_by_opcode(u8 opcode);
