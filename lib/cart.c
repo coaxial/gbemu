@@ -432,7 +432,6 @@ u8 cart_read(u16 addr) { return ctx.rom_p[addr]; };
  * @return true if the write was successful
  */
 bool cart_write(u16 addr, u8 value) {
-  ctx.rom_p[addr] = value;
-
-  return ctx.rom_p[addr] == value;
+  /* TODO: Implement writes */
+  return false;
 };
