@@ -3,7 +3,7 @@
 
 /**
  * Gameboy Memory Map
- * 0x0000 - 0x3FFF: 16 KiB ROM Bank 00                 Read Only
+ * 0x0000 - 0x3FFF: 16 KiB ROM Bank 00                Read Only
  * 0x4000 - 0x7FFF: 16 KiB ROM Bank 01-7F, switchable Read Only
  * 0x8000 - 0x9FFF: Video RAM (VRAM)                  Read/Write
  * 0xA000 - 0xBFFF: External RAM                      Read/Write
