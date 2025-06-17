@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "instructions.h"
 
 typedef struct registers {
   u8 a, b, c, d, e, f, h, l;
@@ -16,6 +17,14 @@ typedef enum { FLAG_ZERO, FLAG_SUBTRACT, FLAG_HALF_CARRY, FLAG_CARRY } flag_t;
 
 typedef struct ctx {
   registers_t regs;
+
+  u16 fetch_data;
+  u16 mem_dest;
+  u8 current_opcode;
+  instruction_t current_instruction;
+
+  bool halted;
+  bool stepping;
 } cpu_ctx_t;
 
 /**
