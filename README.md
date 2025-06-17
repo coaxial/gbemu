@@ -21,3 +21,13 @@ editor.
 mkdir build
 cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 ```
+
+# Running tests
+
+> Adjust verbosity with the `CK_VERBOSITY` environment variable. Possible
+> values are `silent`, `minimal`, `normal`, `subunit`, `verbose`.
+
+```bash
+cd build
+make && CK_VERBOSITY=verbose ./tests/check_gbe
+```
